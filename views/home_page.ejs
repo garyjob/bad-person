@@ -1,0 +1,55 @@
+<script src="/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://<%= host %>:<%= port %>');
+  socket.on('record', function (data) {
+    console.log(data);
+  });
+
+  jQuery(document).ready(function() {
+
+    jQuery("#fetch_records").click(function() {
+      console.log("Harvesting records");
+      socket.emit(
+        'start checking', 
+        { 
+          first_name: jQuery("#first_name").val(),
+          last_name: jQuery("#last_name").val()
+        }
+      );
+    });
+
+    socket.on('record found', function (data) {
+      console.log("Found records");
+      console.log(data);
+      jQuery("#results").append(
+        jQuery("<tr>")
+          .append(jQuery("<td>").html(data["offense_name"]))
+          .append(jQuery("<td>").html(data["offense_date"]))
+          .append(jQuery("<td>").html(data["offense_county"]))
+      );
+    });
+
+  });
+
+</script>
+
+Check is bad person?
+<div>
+  First Name : <input id='first_name'>
+</div>
+<div>
+  Last Name : <input id='last_name'>
+</div>
+<div>
+  <input type='button' id='fetch_records' value='do background check'>
+</div>
+
+<table id="results">
+  <td>
+    <tr>Name of offense</tr>
+    <tr>Date of offense</tr>
+    <tr>County in which offense was committed</tr>
+  </td>
+
+</table>
